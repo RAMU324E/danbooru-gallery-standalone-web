@@ -4,6 +4,13 @@ Standalone web version of the Danbooru Gallery workflow, extracted from a ComfyU
 
 [简体中文](#简体中文) | [English](#english)
 
+## Download
+
+- Windows single-file EXE:
+  [DanbooruGalleryStandalone.exe](https://github.com/RAMU324E/danbooru-gallery-standalone-web/raw/main/downloads/DanbooruGalleryStandalone.exe)
+- Source one-click start:
+  `start_web.bat`
+
 ![Gallery Home](docs/images/gallery-home.png)
 
 ![Gallery Editor](docs/images/gallery-editor.png)
@@ -106,6 +113,13 @@ The project is already structured around a single local entrypoint, so packaging
 MIT. See [LICENSE](LICENSE).
 
 ## 简体中文
+
+### 下载
+
+- Windows 单文件 EXE：
+  [DanbooruGalleryStandalone.exe](https://github.com/RAMU324E/danbooru-gallery-standalone-web/raw/main/downloads/DanbooruGalleryStandalone.exe)
+- 源码一键启动：
+  `start_web.bat`
 
 ### 项目简介
 
