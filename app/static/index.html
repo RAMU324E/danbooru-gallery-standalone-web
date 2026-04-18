@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danbooru Gallery Standalone</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <div class="brand-block">
+                <span class="brand-dot"></span>
+                <div>
+                    <p class="brand-kicker">D站画廊</p>
+                    <h1>Danbooru Gallery</h1>
+                </div>
+            </div>
+            <div class="header-meta">
+                <span id="source-badge" class="status-pill">在线结果</span>
+                <p id="search-status" class="header-status">准备就绪</p>
+                <button id="favorites-count-btn" class="ghost-pill" type="button">收藏 0</button>
+            </div>
+        </header>
+
+        <main class="workspace-shell">
+            <section class="gallery-panel">
+                <div class="toolbar-row">
+                    <div class="search-wrap autocomplete-field">
+                        <input
+                            id="search-tags"
+                            class="search-input"
+                            type="text"
+                            autocomplete="off"
+                            placeholder="输入标签，使用逗号分隔，例如：1girl, black choker, blue archive"
+                        >
+                        <button id="clear-search-btn" class="clear-search-button hidden" type="button" aria-label="清空搜索">×</button>
+                        <div id="search-autocomplete" class="autocomplete-list hidden"></div>
+                    </div>
+
+                    <button id="ranking-toggle" class="toolbar-button" type="button">排行榜</button>
+                    <button id="favorites-toggle" class="toolbar-button" type="button">收藏夹</button>
+
+                    <div class="toolbar-dropdown toolbar-rating" data-dropdown>
+                        <button id="rating-dropdown-btn" class="toolbar-button dropdown-button rating-button" type="button" data-dropdown-button="rating-menu">
+                            <span class="rating-button-caption">评级</span>
+                            <span id="rating-button-value" class="rating-button-value">全部</span>
+                            <span class="dropdown-arrow">▾</span>
+                        </button>
+                        <div id="rating-menu" class="dropdown-menu hidden rating-menu">
+                            <label class="dropdown-item">
+                                <input id="rating-all" type="checkbox" class="rating-checkbox rating-checkbox-all" value="all" checked>
+                                <span>全部</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="rating-checkbox rating-checkbox-value" value="general" checked>
+                                <span>普通</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="rating-checkbox rating-checkbox-value" value="sensitive" checked>
+                                <span>敏感</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="rating-checkbox rating-checkbox-value" value="questionable" checked>
+                                <span>可疑</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="rating-checkbox rating-checkbox-value" value="explicit" checked>
+                                <span>显式</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="toolbar-dropdown" data-dropdown>
+                        <button id="category-dropdown-btn" class="toolbar-button dropdown-button" type="button" data-dropdown-button="category-menu">
+                            类别
+                            <span class="dropdown-arrow">▾</span>
+                        </button>
+                        <div id="category-menu" class="dropdown-menu hidden">
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="toolbar-category-checkbox" value="artist">
+                                <span>画师</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="toolbar-category-checkbox" value="copyright">
+                                <span>版权</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="toolbar-category-checkbox" value="character">
+                                <span>角色</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="toolbar-category-checkbox" value="general">
+                                <span>普通</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input type="checkbox" class="toolbar-category-checkbox" value="meta">
+                                <span>元数据</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="toolbar-dropdown" data-dropdown>
+                        <button id="formatting-dropdown-btn" class="toolbar-button dropdown-button" type="button" data-dropdown-button="formatting-menu">
+                            格式
+                            <span class="dropdown-arrow">▾</span>
+                        </button>
+                        <div id="formatting-menu" class="dropdown-menu hidden">
+                            <label class="dropdown-item">
+                                <input id="fmt-replace-underscores" type="checkbox" checked>
+                                <span>下划线转空格</span>
+                            </label>
+                            <label class="dropdown-item">
+                                <input id="fmt-escape-brackets" type="checkbox" checked>
+                                <span>转义括号</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button id="filter-toggle" class="icon-button" type="button" title="启用或关闭过滤标签">滤</button>
+                    <button id="open-library-btn" class="icon-button" type="button" title="打开词库">库</button>
+                    <button id="open-settings-btn" class="icon-button" type="button" title="打开设置">设</button>
+                    <button id="refresh-btn" class="icon-button" type="button" title="刷新结果">↻</button>
+                </div>
+
+                <div class="sub-toolbar-row">
+                    <div class="sub-toolbar-meta">
+                        <p id="selection-status" class="muted-text">点击图片进入标签编辑。</p>
+                    </div>
+                    <div class="sub-toolbar-fields">
+                        <label class="mini-field">
+                            <span>数量</span>
+                            <input id="search-limit" type="number" min="1" max="100" value="20">
+                        </label>
+                        <div class="pager-controls">
+                            <button id="prev-page-btn" class="pager-button" type="button" title="上一页">←</button>
+                            <label class="mini-field">
+                                <span>页码</span>
+                                <input id="search-page" type="number" min="1" value="1" inputmode="numeric">
+                            </label>
+                            <button id="jump-page-btn" class="pager-button pager-jump-button" type="button" title="跳转到输入页">跳转</button>
+                            <button id="next-page-btn" class="pager-button" type="button" title="下一页">→</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="results-grid" class="gallery-grid"></div>
+            </section>
+        </main>
+    </div>
+
+    <dialog id="viewer-dialog" class="modal-card viewer-modal">
+        <div class="modal-shell">
+            <div class="modal-header">
+                <div>
+                    <p class="modal-kicker">查看大图</p>
+                    <h2 id="viewer-title">图片预览</h2>
+                    <p id="viewer-meta" class="modal-subtitle">点击空白处或右上角关闭。</p>
+                </div>
+                <div class="modal-header-actions">
+                    <button id="viewer-open-post-btn" class="toolbar-button" type="button">打开原帖</button>
+                    <button id="viewer-edit-btn" class="toolbar-button accent-button" type="button">编辑标签</button>
+                    <button id="close-viewer-btn" class="modal-close" type="button" aria-label="关闭大图预览">✕</button>
+                </div>
+            </div>
+            <div class="viewer-body">
+                <img id="viewer-image" alt="">
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="editor-dialog" class="modal-card editor-modal">
+        <div class="modal-shell">
+            <div class="modal-header">
+                <div>
+                    <p class="modal-kicker">编辑提示词</p>
+                    <h2 id="editor-title">选择图片后开始编辑</h2>
+                    <p id="editor-subtitle" class="modal-subtitle">分类勾选会影响下方 Prompt 和复制结果。</p>
+                </div>
+                <button id="close-editor-btn" class="modal-close" type="button" aria-label="关闭编辑器">✕</button>
+            </div>
+
+            <div class="editor-hero">
+                <div class="editor-preview-card">
+                    <img id="editor-preview" alt="post preview">
+                </div>
+                <div class="editor-side-panel">
+                    <div class="editor-meta-block">
+                        <p id="editor-meta-line" class="editor-meta-line">尚未加载图片信息</p>
+                        <a id="editor-post-link" class="editor-post-link hidden" href="#" target="_blank" rel="noreferrer">打开原帖</a>
+                    </div>
+
+                    <div class="editor-add-row">
+                        <label class="editor-add-field autocomplete-field">
+                            <span id="add-tag-target-label">追加到 普通</span>
+                            <input id="add-tag-input" type="text" autocomplete="off" placeholder="输入英文 tag，或输入中文后从补全中选择">
+                            <div id="add-tag-autocomplete" class="autocomplete-list hidden"></div>
+                        </label>
+                        <button id="add-tag-btn" class="toolbar-button accent-button" type="button">追加标签</button>
+                    </div>
+
+                    <details class="cleaning-panel">
+                        <summary>清洗选项</summary>
+                        <div class="cleaning-grid">
+                            <label class="checkbox-item">
+                                <input id="opt-format" type="checkbox" checked>
+                                <span>提示词格式化</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input id="opt-underscore" type="checkbox" checked>
+                                <span>下划线转空格</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input id="opt-weight" type="checkbox" checked>
+                                <span>补全权重语法</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input id="opt-escape" type="checkbox" checked>
+                                <span>智能括号转义</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input id="opt-commas" type="checkbox" checked>
+                                <span>标准化逗号</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input id="opt-region" type="checkbox" checked>
+                                <span>修复分区语法</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input id="opt-remove-lora" type="checkbox">
+                                <span>移除 LoRA 标签</span>
+                            </label>
+                            <label class="cleaning-select">
+                                <span>换行处理</span>
+                                <select id="opt-newlines">
+                                    <option value="false">不处理</option>
+                                    <option value="space">替换为空格</option>
+                                    <option value="comma">替换为逗号</option>
+                                </select>
+                            </label>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <div id="tag-groups" class="editor-tag-groups"></div>
+
+            <div class="prompt-panel">
+                <div class="prompt-panel-header">
+                    <div>
+                        <p class="modal-kicker">Prompt</p>
+                        <h3>当前复制内容</h3>
+                    </div>
+                    <div class="prompt-panel-actions">
+                        <button id="clean-prompt-btn" class="toolbar-button" type="button">清洗</button>
+                        <button id="copy-prompt-btn" class="toolbar-button accent-button" type="button">复制标签</button>
+                    </div>
+                </div>
+                <textarea id="prompt-editor" rows="5" placeholder="这里会显示当前按类别、格式和过滤规则生成的 Prompt。"></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button id="reset-tags-btn" class="toolbar-button" type="button">重置标签</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="settings-dialog" class="modal-card settings-modal">
+        <form id="settings-form" class="modal-shell" method="dialog">
+            <div class="modal-header">
+                <div>
+                    <p class="modal-kicker">设置</p>
+                    <h2>检索与提示词设置</h2>
+                </div>
+                <button id="close-settings-btn" class="modal-close" type="button" aria-label="关闭设置">✕</button>
+            </div>
+
+            <div class="settings-grid">
+                <label class="form-field">
+                    <span>Danbooru 用户名</span>
+                    <input id="settings-username" type="text" placeholder="abc">
+                </label>
+                <label class="form-field">
+                    <span>Danbooru API Key</span>
+                    <input id="settings-api-key" type="password">
+                </label>
+                <label class="form-field form-field-wide">
+                    <span>过滤标签</span>
+                    <textarea id="settings-filter-tags" rows="4" placeholder="每行一个，或使用逗号分隔"></textarea>
+                </label>
+                <label class="checkbox-item">
+                    <input id="settings-filter-enabled" type="checkbox">
+                    <span>启用过滤标签</span>
+                </label>
+                <label class="checkbox-item">
+                    <input id="settings-high-quality-previews" type="checkbox">
+                    <span>高清预览图（更清晰，更耗流量）</span>
+                </label>
+                <label class="form-field">
+                    <span>自动补全数量</span>
+                    <input id="settings-autocomplete-max-results" type="number" min="5" max="100">
+                </label>
+                <div class="form-field form-field-wide">
+                    <span>默认 Prompt 分类</span>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox" name="settings-selected-categories" value="artist"><span>画师</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="settings-selected-categories" value="copyright"><span>版权</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="settings-selected-categories" value="character"><span>角色</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="settings-selected-categories" value="general"><span>普通</span></label>
+                        <label class="checkbox-item"><input type="checkbox" name="settings-selected-categories" value="meta"><span>元数据</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="cancel-settings-btn" class="toolbar-button" type="button">取消</button>
+                <button class="toolbar-button accent-button" type="submit">保存设置</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="library-dialog" class="modal-card library-modal">
+        <div class="modal-shell">
+            <div class="modal-header">
+                <div>
+                    <p class="modal-kicker">词库</p>
+                    <h2>本地 Prompt Library</h2>
+                    <p id="library-meta" class="modal-subtitle">加载中...</p>
+                </div>
+                <div class="modal-header-actions">
+                    <button id="export-library-btn" class="toolbar-button" type="button">导出</button>
+                    <button id="import-library-btn" class="toolbar-button" type="button">导入</button>
+                    <button id="close-library-btn" class="modal-close" type="button" aria-label="关闭词库">✕</button>
+                </div>
+            </div>
+
+            <div class="library-toolbar">
+                <button id="new-category-btn" class="toolbar-button" type="button">新建分类</button>
+                <button id="rename-category-btn" class="toolbar-button" type="button">重命名分类</button>
+                <button id="delete-category-btn" class="toolbar-button" type="button">删除分类</button>
+                <button id="new-prompt-btn" class="toolbar-button accent-button" type="button">新建词条</button>
+            </div>
+
+            <div class="library-layout">
+                <aside id="category-list" class="library-sidebar"></aside>
+                <section id="prompt-list" class="library-content"></section>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="prompt-dialog" class="modal-card prompt-modal">
+        <form id="prompt-form" class="modal-shell" method="dialog">
+            <div class="modal-header">
+                <div>
+                    <p class="modal-kicker">词条编辑</p>
+                    <h2 id="prompt-dialog-title">新建词条</h2>
+                </div>
+                <button id="close-prompt-dialog-btn" class="modal-close" type="button" aria-label="关闭词条编辑">✕</button>
+            </div>
+
+            <div class="settings-grid">
+                <input id="prompt-entry-id" type="hidden">
+                <label class="form-field">
+                    <span>分类</span>
+                    <select id="prompt-entry-category"></select>
+                </label>
+                <label class="form-field">
+                    <span>别名</span>
+                    <input id="prompt-entry-alias" type="text" required>
+                </label>
+                <label class="form-field form-field-wide">
+                    <span>Prompt</span>
+                    <textarea id="prompt-entry-text" rows="8" required></textarea>
+                </label>
+                <label class="form-field form-field-wide">
+                    <span>描述</span>
+                    <textarea id="prompt-entry-description" rows="3"></textarea>
+                </label>
+                <label class="form-field form-field-wide">
+                    <span>标签</span>
+                    <input id="prompt-entry-tags" type="text" placeholder="使用逗号分隔">
+                </label>
+            </div>
+
+            <div class="modal-footer">
+                <button id="cancel-prompt-dialog-btn" class="toolbar-button" type="button">取消</button>
+                <button class="toolbar-button accent-button" type="submit">保存词条</button>
+            </div>
+        </form>
+    </dialog>
+
+    <input id="import-file-input" type="file" accept=".zip" class="hidden">
+    <div id="toast-region" class="toast-region" aria-live="polite"></div>
+
+    <script src="/static/app.js" defer></script>
+</body>
+</html>
