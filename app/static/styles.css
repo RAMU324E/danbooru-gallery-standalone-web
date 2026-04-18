@@ -5,9 +5,13 @@
     --panel-strong: #202328;
     --panel-soft: #17191d;
     --panel-border: #2d3138;
+    --panel-border-soft: rgba(255, 255, 255, 0.06);
+    --panel-border-strong: rgba(255, 255, 255, 0.11);
     --text: #f1f4f8;
     --muted: #9ea5af;
     --muted-strong: #c7cbd2;
+    --surface-highlight: rgba(255, 255, 255, 0.045);
+    --surface-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
     --accent: #6f61ff;
     --accent-strong: #7f73ff;
     --accent-soft: rgba(111, 97, 255, 0.18);
@@ -104,9 +108,10 @@ a {
 .app-header,
 .gallery-panel,
 .modal-shell {
-    background: rgba(24, 26, 30, 0.88);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
+    background:
+        linear-gradient(180deg, rgba(31, 34, 40, 0.92) 0%, rgba(20, 22, 26, 0.9) 100%);
+    border: 1px solid var(--panel-border-soft);
+    box-shadow: var(--surface-shadow);
     backdrop-filter: blur(14px);
 }
 
@@ -115,8 +120,8 @@ a {
     justify-content: space-between;
     align-items: center;
     gap: 16px;
-    padding: 10px 14px;
-    border-radius: 12px;
+    padding: 12px 16px;
+    border-radius: 16px;
 }
 
 .brand-block {
@@ -167,8 +172,8 @@ a {
     min-height: 32px;
     padding: 0 12px;
     border-radius: 999px;
-    border: 1px solid var(--panel-border);
-    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.035);
     color: var(--muted-strong);
     font-size: 13px;
 }
@@ -195,8 +200,8 @@ a {
 
 .gallery-panel {
     min-height: calc(100vh - 120px);
-    padding: 12px;
-    border-radius: 16px;
+    padding: 14px;
+    border-radius: 18px;
 }
 
 .toolbar-row,
@@ -269,7 +274,7 @@ a {
 #prompt-editor {
     width: 100%;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: #111318;
+    background: linear-gradient(180deg, rgba(17, 19, 24, 0.98) 0%, rgba(14, 16, 20, 0.98) 100%);
     color: var(--text);
     border-radius: var(--radius-md);
     padding: 12px 14px;
@@ -292,7 +297,7 @@ a {
     outline: none;
     border-color: rgba(111, 97, 255, 0.7);
     box-shadow: 0 0 0 3px rgba(111, 97, 255, 0.14);
-    background: #12141a;
+    background: linear-gradient(180deg, rgba(19, 21, 28, 0.98) 0%, rgba(17, 19, 24, 0.98) 100%);
 }
 
 .clear-search-button {
@@ -313,10 +318,11 @@ a {
 .icon-button,
 .modal-close {
     border: 1px solid var(--panel-border);
-    background: #17191e;
+    background: linear-gradient(180deg, rgba(25, 27, 33, 0.96) 0%, rgba(21, 23, 28, 0.96) 100%);
     color: var(--text);
     cursor: pointer;
-    transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .toolbar-button {
@@ -329,15 +335,17 @@ a {
 .icon-button:hover,
 .modal-close:hover {
     transform: translateY(-1px);
-    border-color: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 20px rgba(0, 0, 0, 0.22);
 }
 
 .toolbar-button.is-active,
 .icon-button.is-active,
 .accent-button {
-    background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+    background: linear-gradient(135deg, #6456f6 0%, #7d73ff 100%);
     border-color: transparent;
     color: #ffffff;
+    box-shadow: 0 12px 26px rgba(111, 97, 255, 0.28);
 }
 
 .icon-button,
@@ -409,9 +417,9 @@ a {
     min-width: 240px;
     padding: 8px;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(22, 24, 28, 0.98);
-    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: linear-gradient(180deg, rgba(25, 27, 33, 0.98) 0%, rgba(18, 20, 24, 0.98) 100%);
+    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.46);
 }
 
 .autocomplete-list {
@@ -519,8 +527,8 @@ a {
 .editor-side-panel,
 .library-content-empty {
     break-inside: avoid;
-    background: #14161a;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(23, 25, 30, 0.98) 0%, rgba(19, 21, 25, 0.98) 100%);
+    border: 1px solid var(--panel-border-soft);
     border-radius: 14px;
 }
 
@@ -534,7 +542,7 @@ a {
 .gallery-card:hover {
     transform: translateY(-2px);
     border-color: rgba(111, 97, 255, 0.4);
-    box-shadow: 0 18px 28px rgba(0, 0, 0, 0.32);
+    box-shadow: 0 20px 32px rgba(0, 0, 0, 0.32);
 }
 
 .gallery-card.is-selected {
@@ -578,7 +586,7 @@ a {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.52) 100%);
+    background: linear-gradient(180deg, rgba(8, 10, 14, 0.04) 0%, rgba(0, 0, 0, 0.58) 100%);
     pointer-events: none;
 }
 
@@ -602,7 +610,7 @@ a {
     min-height: 24px;
     padding: 0 8px;
     border-radius: 999px;
-    background: rgba(0, 0, 0, 0.68);
+    background: rgba(7, 9, 12, 0.78);
     color: #ffffff;
     font-size: 11px;
     font-weight: 700;
@@ -619,7 +627,7 @@ a {
     height: 28px;
     border-radius: 999px;
     border: none;
-    background: rgba(0, 0, 0, 0.72);
+    background: rgba(8, 10, 14, 0.74);
     color: #fff;
     cursor: pointer;
     transition: transform 0.18s ease, background-color 0.18s ease;
@@ -636,6 +644,7 @@ a {
 
 .gallery-card-footer {
     padding: 10px 12px 12px;
+    background: linear-gradient(180deg, rgba(20, 22, 27, 0.94) 0%, rgba(17, 19, 24, 0.98) 100%);
 }
 
 .gallery-card-topline {
@@ -669,7 +678,7 @@ a {
 }
 
 .modal-card::backdrop {
-    background: rgba(6, 8, 12, 0.72);
+    background: rgba(6, 8, 12, 0.78);
     backdrop-filter: blur(10px);
 }
 
@@ -734,7 +743,7 @@ a {
 
 .editor-preview-card {
     overflow: hidden;
-    background: #101216;
+    background: linear-gradient(180deg, rgba(16, 18, 22, 0.98) 0%, rgba(11, 13, 17, 0.98) 100%);
     min-height: 280px;
 }
 
@@ -757,6 +766,8 @@ a {
     margin-top: 8px;
     color: #d8dbff;
     text-decoration: none;
+    text-decoration-color: rgba(216, 219, 255, 0.28);
+    text-underline-offset: 3px;
 }
 
 .editor-add-row {
@@ -774,7 +785,7 @@ a {
 .cleaning-panel {
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.02);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.015) 100%);
 }
 
 .cleaning-panel summary {
@@ -822,7 +833,8 @@ a {
 
 .tag-section {
     padding: 14px;
-    background: #15181c;
+    background: linear-gradient(180deg, rgba(24, 27, 32, 0.98) 0%, rgba(21, 24, 29, 0.98) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 .tag-section-header {
@@ -851,8 +863,8 @@ a {
     width: 28px;
     height: 28px;
     border-radius: 999px;
-    border: 1px dashed rgba(255, 255, 255, 0.18);
-    background: transparent;
+    border: 1px dashed rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.01);
     color: var(--muted-strong);
     cursor: pointer;
 }
@@ -874,17 +886,18 @@ a {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 10px;
+    padding: 5px 10px;
     border: 1px solid transparent;
-    border-radius: 8px;
+    border-radius: 9px;
     cursor: pointer;
-    font-size: 14px;
-    transition: transform 0.12s ease, filter 0.12s ease, opacity 0.12s ease;
+    font-size: 13px;
+    line-height: 1.4;
+    transition: transform 0.12s ease, filter 0.12s ease, opacity 0.12s ease, border-color 0.12s ease;
 }
 
 .tag-chip:hover {
     transform: translateY(-1px);
-    filter: brightness(1.05);
+    filter: brightness(1.08);
 }
 
 .tag-chip.is-disabled {
@@ -892,37 +905,37 @@ a {
 }
 
 .tag-chip small {
-    font-size: 12px;
-    opacity: 0.9;
+    font-size: 11px;
+    opacity: 0.76;
 }
 
 .tag-chip.tag-category-artist {
-    background: rgba(255, 219, 127, 0.12);
-    border-color: rgba(255, 219, 127, 0.18);
+    background: rgba(255, 219, 127, 0.1);
+    border-color: rgba(255, 219, 127, 0.16);
     color: #f2d487;
 }
 
 .tag-chip.tag-category-copyright {
-    background: rgba(255, 170, 185, 0.12);
-    border-color: rgba(255, 170, 185, 0.18);
+    background: rgba(255, 170, 185, 0.1);
+    border-color: rgba(255, 170, 185, 0.16);
     color: #ffc0cd;
 }
 
 .tag-chip.tag-category-character {
-    background: rgba(149, 224, 175, 0.12);
-    border-color: rgba(149, 224, 175, 0.18);
+    background: rgba(149, 224, 175, 0.1);
+    border-color: rgba(149, 224, 175, 0.16);
     color: #9fe2b5;
 }
 
 .tag-chip.tag-category-general {
-    background: rgba(172, 196, 255, 0.12);
-    border-color: rgba(172, 196, 255, 0.2);
+    background: rgba(172, 196, 255, 0.1);
+    border-color: rgba(172, 196, 255, 0.16);
     color: #acc4ff;
 }
 
 .tag-chip.tag-category-meta {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
     color: #e7eaf0;
 }
 
@@ -936,6 +949,7 @@ a {
 
 .prompt-panel-header {
     padding: 14px 16px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
 }
 
 .prompt-panel-actions {
@@ -954,8 +968,9 @@ a {
     resize: vertical;
     padding: 16px;
     padding-bottom: 24px;
-    background: #101217;
+    background: linear-gradient(180deg, rgba(17, 19, 24, 0.98) 0%, rgba(13, 15, 19, 0.98) 100%);
     color: var(--text);
+    font-size: 14px;
     line-height: 1.65;
     caret-color: var(--accent);
     overflow-y: auto;
@@ -1079,7 +1094,7 @@ a {
     padding: 12px;
     white-space: pre-wrap;
     word-break: break-word;
-    background: #101217;
+    background: linear-gradient(180deg, rgba(17, 19, 24, 0.98) 0%, rgba(13, 15, 19, 0.98) 100%);
     border-radius: 10px;
     color: var(--muted-strong);
     font-family: inherit;
