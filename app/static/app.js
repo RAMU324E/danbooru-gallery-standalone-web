@@ -456,10 +456,25 @@ function isPostFiltered(post) {
     return !isValidImageType(post) || isPostBlacklisted(post);
 }
 
+function getPromptEditorHeightBounds() {
+    const isCompactViewport = window.innerWidth <= 580 || window.innerHeight <= 860;
+    const minHeight = isCompactViewport ? 140 : 220;
+    const viewportRatio = isCompactViewport ? 0.28 : 0.42;
+    const viewportCap = Math.floor(window.innerHeight * viewportRatio);
+    const maxHeight = Math.min(460, Math.max(minHeight + 40, viewportCap));
+    return { minHeight, maxHeight, isCompactViewport };
+}
+
 function resizePromptEditor() {
-    const maxHeight = 460;
+    const { minHeight, maxHeight, isCompactViewport } = getPromptEditorHeightBounds();
     elements.promptEditor.style.height = "auto";
-    const nextHeight = Math.max(220, Math.min(elements.promptEditor.scrollHeight, maxHeight));
+    if (isCompactViewport) {
+        const expandedHeight = Math.max(minHeight, elements.promptEditor.scrollHeight);
+        elements.promptEditor.style.height = `${expandedHeight}px`;
+        elements.promptEditor.style.overflowY = "hidden";
+        return;
+    }
+    const nextHeight = Math.max(minHeight, Math.min(elements.promptEditor.scrollHeight, maxHeight));
     elements.promptEditor.style.height = `${nextHeight}px`;
     elements.promptEditor.style.overflowY = elements.promptEditor.scrollHeight > maxHeight ? "auto" : "hidden";
 }
@@ -1400,6 +1415,12 @@ function openDialog(dialog) {
     if (!dialog.open) {
         dialog.showModal();
     }
+    if (dialog === elements.editorDialog) {
+        window.requestAnimationFrame(() => {
+            dialog.scrollTop = 0;
+            resizePromptEditor();
+        });
+    }
 }
 
 function closeEditor() {
@@ -2027,6 +2048,7 @@ function bindEvents() {
     elements.copyPromptBtn.addEventListener("click", copyPrompt);
     elements.resetTagsBtn.addEventListener("click", resetEditorTags);
     elements.promptEditor.addEventListener("input", resizePromptEditor);
+    window.addEventListener("resize", resizePromptEditor);
 
     elements.openLibraryBtn.addEventListener("click", async () => {
         await loadLibrary();
