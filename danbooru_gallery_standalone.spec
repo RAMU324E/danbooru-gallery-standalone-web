@@ -30,9 +30,11 @@ exe = EXE(
     [],
     name="DanbooruGalleryStandalone",
     icon="icon.ico",
+    version="version_info.txt",
     debug=False,
     bootloader_ignore_signals=False,
+    disable_windowed_traceback=True,
     strip=False,
     upx=False,
-    console=True,
+    console=False,
 )

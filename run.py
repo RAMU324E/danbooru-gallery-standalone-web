@@ -8,6 +8,8 @@ import webbrowser
 
 import uvicorn
 
+from app.main import app
+
 DEFAULT_PORT = 36741
 HOST = "127.0.0.1"
 
@@ -62,8 +64,9 @@ if __name__ == "__main__":
     print(f"Danbooru Gallery Standalone starting on http://{HOST}:{port}")
     threading.Thread(target=open_browser, args=(port,), daemon=True).start()
     uvicorn.run(
-        "app.main:app",
+        app,
         host=HOST,
         port=port,
         reload=False,
+        log_config=None,
     )
