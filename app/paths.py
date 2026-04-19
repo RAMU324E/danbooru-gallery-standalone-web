@@ -2,11 +2,25 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 from pathlib import Path
 
 
-APP_DIR = Path(__file__).resolve().parent
-STANDALONE_DIR = APP_DIR.parent
+def resolve_app_dir() -> Path:
+    if getattr(sys, "frozen", False):
+        bundle_root = Path(getattr(sys, "_MEIPASS", Path(sys.executable).resolve().parent))
+        return bundle_root / "app"
+    return Path(__file__).resolve().parent
+
+
+def resolve_runtime_dir(app_dir: Path) -> Path:
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return app_dir.parent
+
+
+APP_DIR = resolve_app_dir()
+STANDALONE_DIR = resolve_runtime_dir(APP_DIR)
 ASSETS_DIR = APP_DIR / "assets"
 
 DATA_DIR = STANDALONE_DIR / "data"

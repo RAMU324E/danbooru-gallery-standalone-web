@@ -50,6 +50,8 @@ async def lifespan(app: FastAPI):
     app.state.library_service = library_service
     app.state.db_manager = db_manager
     app.state.danbooru_service = danbooru_service
+    if not hasattr(app.state, "shutdown_handler"):
+        app.state.shutdown_handler = None
 
     logger.info("Standalone 服务已初始化")
     try:
@@ -98,6 +100,17 @@ def _fetch_remote_image(image_url: str) -> tuple[bytes, str, str]:
 @app.get("/api/health")
 async def health() -> dict[str, Any]:
     return {"ok": True}
+
+
+@app.post("/api/app/shutdown")
+async def shutdown_app() -> dict[str, Any]:
+    shutdown_handler = getattr(app.state, "shutdown_handler", None)
+    if not callable(shutdown_handler):
+        raise HTTPException(status_code=503, detail="当前运行模式不支持退出应用")
+
+    loop = asyncio.get_running_loop()
+    loop.call_later(0.2, shutdown_handler)
+    return {"ok": True, "message": "应用正在退出"}
 
 
 @app.get("/api/settings")

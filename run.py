@@ -63,10 +63,13 @@ if __name__ == "__main__":
     port = pick_port(HOST, requested_port)
     print(f"Danbooru Gallery Standalone starting on http://{HOST}:{port}")
     threading.Thread(target=open_browser, args=(port,), daemon=True).start()
-    uvicorn.run(
+    config = uvicorn.Config(
         app,
         host=HOST,
         port=port,
         reload=False,
         log_config=None,
     )
+    server = uvicorn.Server(config)
+    app.state.shutdown_handler = lambda: setattr(server, "should_exit", True)
+    server.run()

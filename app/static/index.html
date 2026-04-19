@@ -20,6 +20,7 @@
                 <span id="source-badge" class="status-pill">在线结果</span>
                 <p id="search-status" class="header-status">准备就绪</p>
                 <button id="favorites-count-btn" class="ghost-pill" type="button">收藏 0</button>
+                <button id="open-exit-dialog-btn" class="ghost-pill ghost-pill-danger" type="button">退出应用</button>
             </div>
         </header>
 
@@ -165,6 +166,27 @@
             </div>
             <div class="viewer-body">
                 <img id="viewer-image" alt="">
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="exit-dialog" class="modal-card confirm-modal">
+        <div class="modal-shell">
+            <div class="modal-header">
+                <div>
+                    <p class="modal-kicker">退出</p>
+                    <h2>关闭页面还是退出应用</h2>
+                    <p class="modal-subtitle">关闭浏览器页面不会停止本地服务；如果你想真正结束程序，请选择“退出应用”。</p>
+                </div>
+                <button id="close-exit-dialog-btn" class="modal-close" type="button" aria-label="关闭退出确认">✕</button>
+            </div>
+            <div class="confirm-body">
+                <p class="confirm-copy">如果你直接点浏览器的关闭按钮，浏览器只能显示原生离开提示，不能弹出这里这种自定义选项。</p>
+            </div>
+            <div class="modal-footer">
+                <button id="cancel-exit-btn" class="toolbar-button" type="button">继续使用</button>
+                <button id="close-page-btn" class="toolbar-button" type="button">只关闭页面</button>
+                <button id="confirm-exit-app-btn" class="toolbar-button danger-button" type="button">退出应用</button>
             </div>
         </div>
     </dialog>
@@ -389,6 +411,10 @@
     <input id="import-file-input" type="file" accept=".zip" class="hidden">
     <div id="toast-region" class="toast-region" aria-live="polite"></div>
 
-    <script src="/static/app.js" defer></script>
+    <script src="/static/js/core.js" defer></script>
+    <script src="/static/js/search.js" defer></script>
+    <script src="/static/js/editor.js" defer></script>
+    <script src="/static/js/library.js" defer></script>
+    <script src="/static/js/bootstrap.js" defer></script>
 </body>
 </html>

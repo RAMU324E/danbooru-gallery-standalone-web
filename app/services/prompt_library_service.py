@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import uuid
 import zipfile
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from fastapi import HTTPException, UploadFile
@@ -15,7 +15,7 @@ from ..paths import BUNDLED_DEFAULT_LIBRARY, LIBRARY_FILE, UPLOAD_DIR
 
 
 def utc_now() -> str:
-    return datetime.utcnow().isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 class PromptLibraryService:

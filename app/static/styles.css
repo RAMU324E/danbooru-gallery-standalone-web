@@ -183,9 +183,20 @@ a {
     transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
 }
 
+.ghost-pill-danger {
+    color: #ffd4dc;
+    border-color: rgba(212, 81, 99, 0.26);
+    background: rgba(212, 81, 99, 0.1);
+}
+
 .ghost-pill:hover {
     transform: translateY(-1px);
     border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ghost-pill-danger:hover {
+    border-color: rgba(212, 81, 99, 0.42);
+    background: rgba(212, 81, 99, 0.16);
 }
 
 .header-status {
@@ -346,6 +357,13 @@ a {
     border-color: transparent;
     color: #ffffff;
     box-shadow: 0 12px 26px rgba(111, 97, 255, 0.28);
+}
+
+.danger-button {
+    background: linear-gradient(135deg, #b7445a 0%, #d45163 100%);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 12px 26px rgba(212, 81, 99, 0.24);
 }
 
 .icon-button,
@@ -718,6 +736,20 @@ a {
 .viewer-body {
     padding: 12px 18px 18px;
     background: #0d0f13;
+}
+
+.confirm-modal {
+    width: min(640px, calc(100vw - 24px));
+}
+
+.confirm-body {
+    padding: 16px 18px 8px;
+}
+
+.confirm-copy {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.65;
 }
 
 .viewer-body img {
