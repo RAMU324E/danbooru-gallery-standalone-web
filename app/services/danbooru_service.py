@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import threading
+import time
 from typing import Iterable
 from urllib.parse import urljoin
 
@@ -17,6 +19,9 @@ from .settings_service import SettingsService
 logger = get_logger(__name__)
 
 BASE_URL = "https://danbooru.donmai.us"
+DANBOORU_HEADERS = {
+    "User-Agent": "Danbooru-Gallery/1.0",
+}
 
 CATEGORY_FIELDS = [
     ("artist", "tag_string_artist"),
@@ -25,6 +30,60 @@ CATEGORY_FIELDS = [
     ("general", "tag_string_general"),
     ("meta", "tag_string_meta"),
 ]
+
+ALLOWED_RATINGS = {
+    "general": "general",
+    "sensitive": "sensitive",
+    "questionable": "questionable",
+    "explicit": "explicit",
+    "g": "general",
+    "s": "sensitive",
+    "q": "questionable",
+    "e": "explicit",
+}
+
+
+class _RateLimiter:
+    def __init__(self, min_interval_sec: float):
+        self.min_interval = min_interval_sec
+        self._last_ts = 0.0
+        self._lock = threading.Lock()
+
+    def wait(self) -> None:
+        with self._lock:
+            now = time.monotonic()
+            elapsed = now - self._last_ts
+            if elapsed < self.min_interval:
+                time.sleep(self.min_interval - elapsed)
+            self._last_ts = time.monotonic()
+
+
+_donmai_throttle = _RateLimiter(min_interval_sec=0.2)
+
+
+def danbooru_request(method: str, url: str, **kwargs) -> requests.Response:
+    headers = dict(kwargs.pop("headers", None) or {})
+    for key, value in DANBOORU_HEADERS.items():
+        headers.setdefault(key, value)
+
+    response = None
+    for attempt in range(2):
+        _donmai_throttle.wait()
+        response = requests.request(method, url, headers=headers, **kwargs)
+        if response.status_code not in {429, 503} or attempt == 1:
+            return response
+
+        retry_after = response.headers.get("Retry-After")
+        delay = 2.0
+        try:
+            if retry_after is not None:
+                delay = min(max(float(retry_after), 0.5), 10.0)
+        except ValueError:
+            pass
+        logger.warning(f"[Danbooru] {response.status_code} 限流，{delay:.1f}s 后重试: {url}")
+        time.sleep(delay)
+
+    return response
 
 
 class DanbooruFavoriteError(Exception):
@@ -74,6 +133,17 @@ class DanbooruService:
         except (json.JSONDecodeError, ValueError):
             return response.text
 
+    @staticmethod
+    def _normalize_rating_values(rating: str | None) -> list[str]:
+        if not rating or rating.lower() == "all":
+            return []
+        values: list[str] = []
+        for raw_value in rating.split(","):
+            normalized = ALLOWED_RATINGS.get(raw_value.strip().lower())
+            if normalized and normalized not in values:
+                values.append(normalized)
+        return values
+
     def _require_auth(self) -> tuple[str, HTTPBasicAuth]:
         username, api_key = self._credentials()
         if not username or not api_key:
@@ -109,10 +179,14 @@ class DanbooruService:
 
         if date_tag:
             search_tags.append(date_tag)
-        if rating and rating.lower() != "all":
-            search_tags.append(f"rating:{rating.lower()}")
+        rating_values = self._normalize_rating_values(rating)
+        if len(rating_values) == 1:
+            search_tags.append(f"rating:{rating_values[0]}")
+        elif len(rating_values) > 1:
+            search_tags.extend(f"~rating:{value}" for value in rating_values)
 
-        response = requests.get(
+        response = danbooru_request(
+            "GET",
             f"{BASE_URL}/posts.json",
             params={"tags": " ".join(search_tags), "limit": limit, "page": page},
             auth=self._auth(),
@@ -150,7 +224,8 @@ class DanbooruService:
 
     def add_favorite(self, post_id: int) -> dict:
         _, auth = self._require_auth()
-        response = requests.post(
+        response = danbooru_request(
+            "POST",
             f"{BASE_URL}/favorites.json",
             auth=auth,
             data={"post_id": post_id},
@@ -176,7 +251,8 @@ class DanbooruService:
 
     def remove_favorite(self, post_id: int) -> dict:
         _, auth = self._require_auth()
-        response = requests.delete(
+        response = danbooru_request(
+            "DELETE",
             f"{BASE_URL}/favorites/{post_id}.json",
             auth=auth,
             timeout=15,
@@ -201,7 +277,8 @@ class DanbooruService:
         truncated = False
 
         for page in range(1, max_pages + 1):
-            response = requests.get(
+            response = danbooru_request(
+                "GET",
                 f"{BASE_URL}/posts.json",
                 params={"tags": f"ordfav:{username}", "limit": page_limit, "page": page},
                 auth=auth,
@@ -254,7 +331,8 @@ class DanbooruService:
         except Exception as exc:
             logger.warning(f"[Autocomplete] 数据库查询失败: {exc}")
 
-        response = requests.get(
+        response = danbooru_request(
+            "GET",
             f"{BASE_URL}/tags.json",
             params={
                 "search[name_or_alias_matches]": f"{query}*",

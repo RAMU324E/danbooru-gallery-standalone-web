@@ -3,6 +3,7 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 import sys
 
@@ -10,6 +11,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.paths import DEFAULT_SETTINGS
+from app.services.danbooru_service import DanbooruService
 from app.services.prompt_library_service import PromptLibraryService
 from app.services.settings_service import SettingsService
 
@@ -114,6 +116,64 @@ class PromptLibraryServiceTests(unittest.TestCase):
 
         deleted_category = self.service.delete_category("Category Alpha")
         self.assertFalse(any(category["name"] == "Category Alpha" for category in deleted_category["categories"]))
+
+
+class DanbooruServiceTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.settings_file = Path(self.temp_dir.name) / "settings.json"
+        self.settings_service = SettingsService(settings_file=self.settings_file)
+        self.db_manager = Mock()
+        self.service = DanbooruService(db_manager=self.db_manager, settings_service=self.settings_service)
+
+    def tearDown(self) -> None:
+        self.temp_dir.cleanup()
+
+    def test_search_posts_uses_descriptive_user_agent_and_multi_rating_or_syntax(self) -> None:
+        response = Mock()
+        response.status_code = 200
+        response.headers = {}
+        response.json.return_value = [
+            {
+                "id": 123,
+                "rating": "g",
+                "score": 10,
+                "fav_count": 2,
+                "file_ext": "jpg",
+                "image_width": 1000,
+                "image_height": 1400,
+                "created_at": "2026-05-15T00:00:00.000-04:00",
+                "preview_file_url": "/preview.jpg",
+                "large_file_url": "/large.jpg",
+                "file_url": "/full.jpg",
+                "tag_string": "artist_tag copyright_tag general_tag",
+                "tag_string_artist": "artist_tag",
+                "tag_string_copyright": "copyright_tag",
+                "tag_string_character": "",
+                "tag_string_general": "general_tag",
+                "tag_string_meta": "",
+            }
+        ]
+
+        with (
+            patch("app.services.danbooru_service._donmai_throttle.wait", return_value=None),
+            patch("app.services.danbooru_service.requests.request", return_value=response) as request_mock,
+        ):
+            results = self.service.search_posts("1girl order:rank", limit=20, page=1, rating="general,sensitive")
+
+        self.assertEqual(results[0]["id"], 123)
+        _, called_url = request_mock.call_args.args[:2]
+        self.assertEqual(called_url, "https://danbooru.donmai.us/posts.json")
+        self.assertEqual(
+            request_mock.call_args.kwargs["headers"]["User-Agent"],
+            "Danbooru-Gallery/1.0",
+        )
+        self.assertEqual(request_mock.call_args.kwargs["params"]["limit"], 20)
+        self.assertEqual(request_mock.call_args.kwargs["params"]["page"], 1)
+        self.assertEqual(
+            request_mock.call_args.kwargs["params"]["tags"],
+            "1girl order:rank ~rating:general ~rating:sensitive",
+        )
 
 
 if __name__ == "__main__":

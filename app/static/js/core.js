@@ -410,10 +410,10 @@ function applySelectedRatingValues(selectedValues = RATING_VALUES) {
 
 function getServerRatingParam() {
     const selected = getSelectedRatingValues();
-    if (selected.length === 1) {
-        return RATING_META[selected[0]]?.api || "all";
+    if (!selected.length || selected.length === RATING_VALUES.length) {
+        return "all";
     }
-    return "all";
+    return selected.join(",");
 }
 
 function filterPostsBySelectedRatings(posts) {

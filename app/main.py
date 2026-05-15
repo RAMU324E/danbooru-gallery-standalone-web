@@ -22,7 +22,7 @@ from .schemas import (
     SettingsUpdateRequest,
     TranslateBatchRequest,
 )
-from .services.danbooru_service import DanbooruFavoriteError, DanbooruService
+from .services.danbooru_service import DanbooruFavoriteError, DanbooruService, danbooru_request
 from .services.prompt_clean_service import PromptCleanService
 from .services.prompt_library_service import PromptLibraryService
 from .services.settings_service import SettingsService
@@ -84,9 +84,9 @@ def danbooru_service(request_app: FastAPI) -> DanbooruService:
 
 
 def _fetch_remote_image(image_url: str) -> tuple[bytes, str, str]:
-    response = requests.get(
+    response = danbooru_request(
+        "GET",
         image_url,
-        headers={"User-Agent": "DanbooruGalleryStandalone/1.0"},
         timeout=20,
     )
     response.raise_for_status()
